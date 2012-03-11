@@ -1,0 +1,35 @@
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://169.254.102.39:8081/jquery.js"></script>
+<script>
+  var socket = io.connect('http://169.254.102.39:8080');
+  var remote = io.connect('http://ec2-23-20-144-147.compute-1.amazonaws.com:8080')
+  
+  remote.on('response', function(data){
+    socket.emit('response', data)
+  })
+  
+  socket.on('render', function(data){
+    document.getElementById('content').innerHTML += data
+  })
+  
+  socket.on('proxy', function(data){
+    remote.emit('webpage', { page: data });
+  })
+  
+  var send = function() {
+    var message = $('#data').val();
+    $('#data').val('');
+    socket.emit('webpage', { page: message });
+  };
+
+  $('#data').keypress(function(e) {
+    if(e.which == 13) {
+      send()
+    }
+  });
+  
+</script>
+  <input id="data"/>
+  <button onClick="send()">send</button>
+
+<div id="content"></div>
